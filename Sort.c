@@ -29,6 +29,7 @@ static int compare_two_elements_up(const data* value1, const data* value2)
 
 }
 
+
 static int compare_two_elements_down(const data* value1, const data* value2)
 {
 	int s;
@@ -42,6 +43,7 @@ static int compare_two_elements_down(const data* value1, const data* value2)
 		return value2->rating - value1->rating ;
 	return value2->document - value1->document;
 }
+
 
 static void bubble_sort(data* ptr, compare_ptr compare, int n)
 {
@@ -57,6 +59,7 @@ static void bubble_sort(data* ptr, compare_ptr compare, int n)
 	}
 }
 
+
 static void insertion_sort(data* ptr, compare_ptr compare, int n) 
 {
 	for (int i = 1; i < n; i++) {
@@ -69,66 +72,49 @@ static void insertion_sort(data* ptr, compare_ptr compare, int n)
 		ptr[j + 1] = value;
 	}
 }
-///хуйня !!!!!!!!!!!!!!!!!!!!!!!
-//сделайть шейкер!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-static void fusion_sort(data* ptr, int left, int right, compare_ptr compare) 
+
+
+static void shaker_sort(data* ptr, compare_ptr compare, int n)
 {
-	if (left < right) {
-		int mid = left + (right - left) / 2;
-		fusion_sort(ptr, left, mid, compare);
-		fusion_sort(ptr, mid + 1, right, compare);
-		fusion1(ptr, left, mid, right, compare);
+	int left = 0;
+	int right = n - 1;
+	bool swapped = true;
+
+	while (left < right && swapped)
+	{
+		swapped = false;
+		for (int i = left; i < right; i++)
+		{
+			if (compare(&ptr[i], &ptr[i + 1]) > 0)
+			{
+				data temp = ptr[i];
+				ptr[i] = ptr[i + 1];
+				ptr[i + 1] = temp;
+				swapped = true;
+			}
+		}
+		right--;
+
+		if (!swapped)
+		{
+			break;
+		}
+
+		swapped = false;
+		for (int i = right; i > left; i--)
+		{
+			if (compare(&ptr[i - 1], &ptr[i]) > 0)
+			{
+				data temp = ptr[i];
+				ptr[i] = ptr[i - 1];
+				ptr[i - 1] = temp;
+				swapped = true;
+			}
+		}
+		left++;
 	}
 }
 
-static void fusion1(data* ptr, int left, int mid, int right, compare_ptr compare)
-{
-	int size1 = mid - left + 1; 
-	int size2 = right - mid;
-
-	data* L = malloc(size1 * sizeof(data)); //��������� ��� ������ ����������
-	if (L == NULL)
-	{
-		printf("Malloc error!\n");
-		return;
-	}
-	data* R = malloc(size2 * sizeof(data)); //��������� ��� ������� ����������
-	if (R == NULL)
-	{
-		printf("Malloc error!\n");
-		return;
-	}
-	for (int i = 0; i < size1; i++) L[i] = ptr[left + i];
-	for (int j = 0; j < size2; j++) R[j] = ptr[mid + 1 + j];
-
-	int i = 0, j = 0, k = left;
-	while (i < size1 && j < size2) {
-		if (compare(&L[i], &R[j]) <= 0) {
-			ptr[k] = L[i];
-			i++;
-		}
-		else {
-			ptr[k] = R[j];
-			j++;
-		}
-		k++;
-	}
-	while (i < size1)
-	{
-		ptr[k] = L[i];
-		i++;
-		k++;
-	}
-	while (j < size2)
-	{
-		ptr[k] = R[j];
-		j++;
-		k++;
-	}
-
-	free(L);
-	free(R);
-}
 
 void sort_menu(const char* file_name)
 {
@@ -154,7 +140,7 @@ void sort_menu(const char* file_name)
 		{
 			compare = compare_two_elements_up;
 		}
-		printf("Enter value of massive which you want to be sorted(Maximum value - 300k)\n");
+		printf("Enter value of massive which you want to be sorted(Maximum value - %d)\n", TOTAL_RECORDS);
 		if (scanf_c("%d", &massive_size) != 1 || (massive_size < 1 || massive_size > 300000))
 		{
 			printf("Input error!\n");
@@ -169,7 +155,7 @@ void sort_menu(const char* file_name)
 		printf("Choose sorting algoritm from list:\n"
 			"1 - Bubble sort\n"
 			"2 - Insert sort\n"
-			"3 - Fusion sort\n"
+			"3 - Shaker sort\n"
 			"4 - Back\n");
 		scanf_c("%d", &sw);
 		switch (sw)
@@ -196,10 +182,10 @@ void sort_menu(const char* file_name)
 			free(array);
 			return;
 		}
-		case fusion:
+		case shaker:
 		{
 			clock_t start = clock();
-			fusion_sort(array, 0, massive_size - 1, compare);
+			shaker_sort(array, compare, massive_size);
 			clock_t end = clock();
 			double time_spent = (double)(end - start) / CLOCKS_PER_SEC;
 			printf("Time: %.12lf sec\n", time_spent);

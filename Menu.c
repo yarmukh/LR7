@@ -118,6 +118,7 @@ static int print_records(const char* file_name)
         }
     }
     fclose(file);
+
     return j;
 }
 
@@ -321,6 +322,7 @@ void generate_records300k()
         strncpy(record.specialization, specializations[rand() % 15], MAX_MISC_SIZE - 1);
         record.summa = 50 + rand() % 500;
         record.rating = 1 + rand() % 24;
+        record.document = ( (rand() % 2)==0 );
         record.is_deleted = 0;
         fwrite(&record, sizeof(data), 1, file);
     }

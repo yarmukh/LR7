@@ -2,7 +2,7 @@
 
 #define MAX_NAME_SIZE 50 
 #define MAX_MISC_SIZE (MAX_NAME_SIZE / 2) 
-#define TOTAL_RECORDS 300000
+#define TOTAL_RECORDS 100
 #include <stdbool.h>
 
 //#define MANUAL_TYPING
